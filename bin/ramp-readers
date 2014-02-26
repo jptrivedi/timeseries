@@ -1,0 +1,24 @@
+#!/bin/bash
+
+[[ -n "$1" ]] || { 
+    echo "Usage: ramp-readers <serverCount> <maxDays> <sample|day|hour> <concurrency> <time> <hostname>" 
+    echo "Example: ramp-readers 10000 sample 10 60 localhost" 
+    exit 0;
+}
+
+serverCount=$1
+maxDays=$2
+impl=$3
+concurrency=$4
+testtime=$5
+host=$6
+
+for days in `seq 1 ${maxDays}`; do 
+    echo "Launching ${concurrency} readers reading ${days} data each..." 
+    for i in `seq 1 ${concurrency}`; do
+        mongo --host $host --eval "var serverCount=${serverCount}; var dayCount=${days}; var impl='${impl}';" lib/reader.js &
+    done
+    sleep ${testtime}
+    ./bin/killallreaders
+done
+

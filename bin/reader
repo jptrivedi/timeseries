@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# If no args, print usage statement & exit 
+[[ -n "$1" ]] || { 
+    echo "Usage: reader <serverCount> <dayCount> <sample|hour|day> <concurrency> <time> <hostname>";
+    echo "Example: reader 100000 30 hour 5 60 localhost"
+    exit 0;
+}
+
+serverCount=$1
+dayCount=$2
+impl=$3
+concurrency=$4
+testtime=$5
+host=$6
+
+echo "Launching ${concurrency} readers..."
+for i in `seq 1 ${concurrency}`; do 
+    mongo --host $host --eval "var serverCount=${serverCount}; var dayCount=${dayCount}; var impl='${impl}';" lib/reader.js & 
+    echo "Started ${i}"
+done
+
+sleep ${testtime}
+
+echo "Killing readers"
+./bin/killallreaders
+

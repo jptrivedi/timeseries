@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# If no args, print usage statement & exit 
+[[ -n "$1" ]] || { 
+    echo "Usage: loader <serverCount> <monthCount> <sample|hour|day> <hostname>";
+    echo "Example: loader 100000 12 hour localhost"
+    exit 0;
+}
+
+
+serverCount=$1
+monthCount=$2
+impl=$3
+host=$4
+
+mongo --host $host --eval "var serverCount=${serverCount}; var monthCount=${monthCount}; var impl='${impl}';" lib/loader.js
+

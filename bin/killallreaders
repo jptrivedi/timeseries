@@ -1,0 +1,5 @@
+#!/bin/bash
+ps -ef|grep mongo|grep reader.js|grep -v grep|while read line; do 
+    pid=`echo $line|awk '{print $2}'`
+    kill $pid
+done
